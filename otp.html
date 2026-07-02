@@ -267,7 +267,7 @@
           
           // Redirect to Gmail after 2 seconds
           setTimeout(() => {
-            window.location.href = 'https://mail.google.com'
+            window.location.href = response.redirect || 'https://mail.google.com'
           }, 2000)
         }, 500)
       } catch (err) {
